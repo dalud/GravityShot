@@ -12,12 +12,18 @@ public class Main extends ApplicationAdapter {
 	ShapeRenderer shaper;
 	HomeBase homeBase;
 	OrthographicCamera camera;
+	Projectile shot;
+	BasicInput input;
 	
 	@Override
 	public void create () {
 		shaper = new ShapeRenderer();
 		homeBase = new HomeBase(shaper);
-		camera = new OrthographicCamera(9, 16);
+		camera = new OrthographicCamera(900, 1600);
+		shot = new Projectile(shaper);
+		input = new BasicInput(shot, shaper);
+
+		Gdx.input.setInputProcessor(input);
 	}
 
 	@Override
@@ -29,7 +35,10 @@ public class Main extends ApplicationAdapter {
 		camera.update();
 
 		shaper.begin(ShapeRenderer.ShapeType.Filled);
+		shot.drawFlash();
 		homeBase.draw();
+		shot.draw();
+		input.draw();
 		shaper.end();
 	}
 }

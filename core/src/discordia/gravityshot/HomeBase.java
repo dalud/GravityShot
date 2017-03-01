@@ -13,13 +13,12 @@ public class HomeBase {
 
     public HomeBase(ShapeRenderer shaper){
         this.shaper = shaper;
-        width = 9; //Gdx.graphics.getWidth();
-        height = 16; //Gdx.graphics.getHeight();
+        width = 900; //Gdx.graphics.getWidth();
+        height = 1600; //Gdx.graphics.getHeight();
     }
 
     public void draw() {
-        shaper.setColor(0, .5f, .5f, 1);
-        //shaper.circle(0, 0, 1);
-        shaper.rect(0, 0, 3, 3);
+        shaper.setColor(0, .3f, .3f, 1);
+        shaper.circle(0, -height/1.3f, width/1.5f);
     }
 }
