@@ -19,6 +19,6 @@ public class HomeBase {
 
     public void draw() {
         shaper.setColor(0, .3f, .3f, 1);
-        shaper.circle(0, -height/1.3f, width/1.5f);
+        shaper.circle(0, -height*.95f, width);
     }
 }

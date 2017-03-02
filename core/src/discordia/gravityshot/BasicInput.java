@@ -1,12 +1,10 @@
 package discordia.gravityshot;
 
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-
 
 /**
  * Created by Dalud on 1.3.2017.
@@ -43,44 +41,37 @@ public class BasicInput implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        //System.out.println(screenY-initY);
+        if(!shot.launched){
+            pull.set(screenX-initX, screenY-initY);
+            charge = (int) pull.len();
+            if(charge > maxCharge) charge = maxCharge; //MAKSIMI-CHARGE
 
+            angle = (int) -pull.angle()+90;
+            if(angle < -maxAngle || angle > maxAngle) { //MAX ANGLE
+                if(angle < 0) angle = -maxAngle;
+                else angle = maxAngle;
+            }
 
-        pull.set(screenX-initX, screenY-initY);
-        charge = (int) pull.len();
+            sling.set(initX, height-initY-charge, width/15, charge);
 
-        //charge = (screenY - initY);
-        if(charge < 0) charge = 0; //EI SAA AMPUA TAAKSEPÄIN
-        else if(charge > maxCharge) charge = maxCharge; //MAKSIMI-CHARGE
-
-        //angle = (screenX - initX) * maxAngle / width*2; //MAX ANGLE SUHTEUTETTUNA RUUDUN LEVEYTEEN
-        angle = (int) -pull.angle()+90;
-
-        System.out.println(angle);
-        if(angle < -maxAngle || angle > maxAngle) {
-            if(angle < 0) angle = -maxAngle;
-            else angle = maxAngle;
+            shot.angle = angle;
         }
-
-        sling.set(initX, height-initY-charge, 45, charge);
-
-        shot.angle = angle;
-
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        shot.shoot(charge, angle);
-        charge = 0;
-
+        if(!shot.launched){
+            shot.shoot(charge);
+            charge = 0;
+        }
         return false;
     }
 
     public void draw() {
         //POWERBAR
-        shaper.setColor(1, 0, 0, 1);
-        shaper.rect(-width/2, -height/2, (float)charge/maxCharge*width, 25);
+        shaper.setColor(.5f, 0, 0, 1);
+        shaper.rect(-width/2, -height/2, (float)charge/maxCharge*width, height/24);
 
         //SLINGTRAIL
         shaper.setColor(.2f, .2f, .2f, 1);

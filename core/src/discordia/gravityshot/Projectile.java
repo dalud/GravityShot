@@ -15,13 +15,13 @@ public class Projectile {
     int width, height, angle, maxAngle, countdown;
     float power, maxPower, Angle, color;
     Sound success, failure;
-    boolean fail, succeed;
+    boolean fail, succeed, launched;
 
     public Projectile(ShapeRenderer shaper){
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
         this.shaper = shaper;
-        location = new Rectangle(0, -height/2.3f, 7.5f, 42.5f);
+        location = new Rectangle(-width/40/2, -height/2.35f, width/40, height/20);
         success = Gdx.audio.newSound(Gdx.files.internal("sounds/success.mp3"));
         failure = Gdx.audio.newSound(Gdx.files.internal("sounds/failure.mp3"));
         color = 1;
@@ -33,7 +33,7 @@ public class Projectile {
         location.setPosition(location.x+Angle, location.y+power);
 
         shaper.setColor(.5f, .5f, .5f, 1);
-        shaper.rect(location.x, location.y, 5, 0, location.width, location.height, 1, 1, angle);
+        shaper.rect(location.x, location.y, location.width/2, location.height/2, location.width, location.height, 1, 1, angle);
 
         //SUCCESS
         if(location.y > height/2) {
@@ -71,14 +71,18 @@ public class Projectile {
     }
 
     private void reset() {
+        launched = false;
         location.setPosition(0, -height/2.3f);
         power = Angle = angle = 0;
     }
 
-    public void shoot(int charge, int angle) {
+    public void shoot(int charge) {
+        if(!launched){
+            power = (float)charge/300*maxPower;
+            if(power > maxPower) power = maxPower;
+            Angle = -power*angle/maxAngle;
 
-        power = charge;
-        if(power > maxPower) power = maxPower;
-        Angle = -power*angle/maxAngle;
+            launched = true;
+        }
     }
 }
