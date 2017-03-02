@@ -1,9 +1,11 @@
 package discordia.gravityshot;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 
 /**
@@ -12,15 +14,21 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class BasicInput implements InputProcessor {
     Projectile shot;
-    Rectangle powerBar;
-    int charge, initY, initX, angle;
+    Rectangle powerBar, sling;
+    int charge, maxCharge, initY, initX, angle, maxAngle, width, height;
     ShapeRenderer shaper;
-
+    Vector2 pull;
 
     public BasicInput(Projectile shot, ShapeRenderer shaper){
         this.shot = shot;
         this.shaper = shaper;
         powerBar = new Rectangle();
+        sling = new Rectangle();
+        maxCharge = 300;
+        maxAngle = 45;
+        shot.maxAngle = maxAngle;
+        width = Gdx.graphics.getWidth();
+        height = Gdx.graphics.getHeight();
     }
 
     @Override
@@ -28,21 +36,36 @@ public class BasicInput implements InputProcessor {
         initY = screenY;
         initX = screenX;
 
+        pull = new Vector2(0, 0);
+
         return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        charge = screenY - initY;
-        if(charge < 0) charge = 0;
-        angle = (screenX - initX) * 45 / Gdx.graphics.getWidth();
-        if(angle < -45 || angle > 45) {
-            if(angle < 0) angle = -45;
-            else angle = 45;
+        //System.out.println(screenY-initY);
+
+
+        pull.set(screenX-initX, screenY-initY);
+        charge = (int) pull.len();
+
+        //charge = (screenY - initY);
+        if(charge < 0) charge = 0; //EI SAA AMPUA TAAKSEPÄIN
+        else if(charge > maxCharge) charge = maxCharge; //MAKSIMI-CHARGE
+
+        //angle = (screenX - initX) * maxAngle / width*2; //MAX ANGLE SUHTEUTETTUNA RUUDUN LEVEYTEEN
+        angle = (int) -pull.angle()+90;
+
+        System.out.println(angle);
+        if(angle < -maxAngle || angle > maxAngle) {
+            if(angle < 0) angle = -maxAngle;
+            else angle = maxAngle;
         }
 
-        powerBar.set(shot.location.x, shot.location.y-charge, 10, charge);
+        sling.set(initX, height-initY-charge, 45, charge);
+
         shot.angle = angle;
+
         return false;
     }
 
@@ -55,8 +78,13 @@ public class BasicInput implements InputProcessor {
     }
 
     public void draw() {
+        //POWERBAR
         shaper.setColor(1, 0, 0, 1);
-        shaper.rect(shot.location.x, shot.location.y-charge, 5, charge, 10, charge, 1, 1, angle);
+        shaper.rect(-width/2, -height/2, (float)charge/maxCharge*width, 25);
+
+        //SLINGTRAIL
+        shaper.setColor(.2f, .2f, .2f, 1);
+        shaper.rect(sling.x-sling.width/2-width/2, sling.y-height/2, sling.width/2, charge, sling.width, charge, 1, 1, angle);
     }
 
     @Override

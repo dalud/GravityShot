@@ -12,20 +12,21 @@ import com.badlogic.gdx.math.Rectangle;
 public class Projectile {
     Rectangle location;
     ShapeRenderer shaper;
-    int width, height, angle, countdown;
-    float power, Angle, color;
+    int width, height, angle, maxAngle, countdown;
+    float power, maxPower, Angle, color;
     Sound success, failure;
     boolean fail, succeed;
 
     public Projectile(ShapeRenderer shaper){
-        width = 900;
-        height = 1600;
+        width = Gdx.graphics.getWidth();
+        height = Gdx.graphics.getHeight();
         this.shaper = shaper;
-        location = new Rectangle(0, -height/2.3f, 10, 50);
+        location = new Rectangle(0, -height/2.3f, 7.5f, 42.5f);
         success = Gdx.audio.newSound(Gdx.files.internal("sounds/success.mp3"));
         failure = Gdx.audio.newSound(Gdx.files.internal("sounds/failure.mp3"));
         color = 1;
         countdown = 50;
+        maxPower = 15;
     }
 
     public void draw(){
@@ -77,6 +78,7 @@ public class Projectile {
     public void shoot(int charge, int angle) {
 
         power = charge;
-        Angle = -charge*angle/45;
+        if(power > maxPower) power = maxPower;
+        Angle = -power*angle/maxAngle;
     }
 }

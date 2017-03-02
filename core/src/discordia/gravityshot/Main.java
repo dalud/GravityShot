@@ -19,7 +19,7 @@ public class Main extends ApplicationAdapter {
 	public void create () {
 		shaper = new ShapeRenderer();
 		homeBase = new HomeBase(shaper);
-		camera = new OrthographicCamera(900, 1600);
+		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		shot = new Projectile(shaper);
 		input = new BasicInput(shot, shaper);
 

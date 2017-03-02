@@ -1,6 +1,6 @@
 package discordia.gravityshot;
 
-
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
@@ -13,8 +13,8 @@ public class HomeBase {
 
     public HomeBase(ShapeRenderer shaper){
         this.shaper = shaper;
-        width = 900; //Gdx.graphics.getWidth();
-        height = 1600; //Gdx.graphics.getHeight();
+        width = Gdx.graphics.getWidth();
+        height = Gdx.graphics.getHeight();
     }
 
     public void draw() {
