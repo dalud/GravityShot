@@ -8,16 +8,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  */
 
 public class HomeBase {
-    ShapeRenderer shaper;
     int width, height;
 
-    public HomeBase(ShapeRenderer shaper){
-        this.shaper = shaper;
+    public HomeBase(){
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
     }
 
-    public void draw() {
+    public void draw(ShapeRenderer shaper) {
         shaper.setColor(0, .3f, .3f, 1);
         shaper.circle(0, -height*.95f, width);
     }

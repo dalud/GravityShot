@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Created by Dalud on 1.3.2017.
@@ -11,26 +12,31 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Projectile {
     Rectangle location;
-    ShapeRenderer shaper;
-    int width, height, angle, maxAngle, countdown;
-    float power, maxPower, Angle, color;
+    int width, height, countdown;
+    float angle, color;
     Sound success, failure;
     boolean fail, succeed, launched;
+    Planet check;
+    Vector2 velocity, position;
 
-    public Projectile(ShapeRenderer shaper){
+    public Projectile(Planet check){
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
-        this.shaper = shaper;
         location = new Rectangle(-width/40/2, -height/2.35f, width/40, height/20);
         success = Gdx.audio.newSound(Gdx.files.internal("sounds/success.mp3"));
         failure = Gdx.audio.newSound(Gdx.files.internal("sounds/failure.mp3"));
         color = 1;
         countdown = 50;
-        maxPower = 15;
+        this.check = check;
+        velocity = new Vector2();
+        position = location.getPosition(new Vector2());
     }
 
-    public void draw(){
-        location.setPosition(location.x+Angle, location.y+power);
+    public void draw(ShapeRenderer shaper){
+        calculateDeviation();
+
+        location.setPosition(location.getPosition(position).add(velocity));
+        if(launched)angle = velocity.angle()+90;
 
         shaper.setColor(.5f, .5f, .5f, 1);
         shaper.rect(location.x, location.y, location.width/2, location.height/2, location.width, location.height, 1, 1, angle);
@@ -42,13 +48,22 @@ public class Projectile {
             reset();
         }
         //FAILURE
-        if(location.x < -width/2 || location.x > width/2){
+        if((location.x < -width/2) || (location.x > width/2) || checkCollision(check)){
             failure.play();
             fail = true;
             reset();
         }
     }
-    public void drawFlash(){
+
+    private void calculateDeviation() {
+        if(launched) {
+            check.gravityD.set(check.location.x-location.x, check.location.y-location.y);
+            check.gravityD.setLength(check.gravityF);
+            velocity.add(check.gravityD);
+        }
+    }
+
+    public void drawFlash(ShapeRenderer shaper){
         //DRAW FLASH
         if(succeed || fail){
             countdown--;
@@ -57,6 +72,7 @@ public class Projectile {
             if(succeed) {
                 shaper.setColor(0, color, 0, 0);
                 shaper.rect(-width/2, -height/2, width, height);
+                check.reset();
             }
             else if (fail){
                 shaper.setColor(color, 0, 0, 0);
@@ -72,17 +88,21 @@ public class Projectile {
 
     private void reset() {
         launched = false;
-        location.setPosition(0, -height/2.3f);
-        power = Angle = angle = 0;
+        location.setPosition(0-location.width/2, -height/2.35f);
+        velocity = new Vector2();
+        angle = 0;
     }
 
-    public void shoot(int charge) {
+    public void shoot(Vector2 pull) {
+        pull.setLength(pull.len()/width*13); //SKAALATAAN POWERBARIN MUKAISEKSI
+        if(pull.len() < 3) pull.setLength(3);
         if(!launched){
-            power = (float)charge/300*maxPower;
-            if(power > maxPower) power = maxPower;
-            Angle = -power*angle/maxAngle;
-
+            velocity = pull;
             launched = true;
         }
+    }
+
+    public boolean checkCollision(Planet check){ //PARAMETRI, KOSKA TULEE LISÄÄ PLANEETTOJA JOSKUS EHKÄ
+        return (int)(location.getPosition(position).sub(new Vector2(check.location.x, check.location.y)).len()-check.radius) < 0;
     }
 }

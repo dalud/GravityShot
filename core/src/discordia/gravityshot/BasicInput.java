@@ -14,18 +14,15 @@ public class BasicInput implements InputProcessor {
     Projectile shot;
     Rectangle powerBar, sling;
     int charge, maxCharge, initY, initX, angle, maxAngle, width, height;
-    ShapeRenderer shaper;
     Vector2 pull;
 
-    public BasicInput(Projectile shot, ShapeRenderer shaper){
+    public BasicInput(Projectile shot){
         this.shot = shot;
-        this.shaper = shaper;
         powerBar = new Rectangle();
         sling = new Rectangle();
-        maxCharge = 300;
-        maxAngle = 45;
-        shot.maxAngle = maxAngle;
+        maxAngle = 60;
         width = Gdx.graphics.getWidth();
+        maxCharge = width;
         height = Gdx.graphics.getHeight();
     }
 
@@ -42,8 +39,14 @@ public class BasicInput implements InputProcessor {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if(!shot.launched){
-            pull.set(screenX-initX, screenY-initY);
-            charge = (int) pull.len();
+            if(screenY < initY) {
+                screenY = initY; //EI ANNETA AMPUA TAAKSEPÄIN
+                pull.setLength(0);
+            }
+            else pull.set(screenX-initX, screenY-initY);
+
+            charge = (int) pull.len()*2; //SKAALATAAN JÄRKEVÄMMÄKSI, ETTEI TARVI RAAHATA KOKO NÄYTÖN PITUUTTA
+
             if(charge > maxCharge) charge = maxCharge; //MAKSIMI-CHARGE
 
             angle = (int) -pull.angle()+90;
@@ -52,7 +55,7 @@ public class BasicInput implements InputProcessor {
                 else angle = maxAngle;
             }
 
-            sling.set(initX, height-initY-charge, width/15, charge);
+            sling.set(initX, height/2-initY-(screenY-initY), width/15, screenY-initY);
 
             shot.angle = angle;
         }
@@ -62,20 +65,23 @@ public class BasicInput implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if(!shot.launched){
-            shot.shoot(charge);
+            pull.setLength(charge);
+            if(charge > 0) shot.shoot(new Vector2(-pull.x, pull.y));
+            else shot.angle = 0;
             charge = 0;
         }
+        sling.height = 0;
         return false;
     }
 
-    public void draw() {
+    public void draw(ShapeRenderer shaper) {
         //POWERBAR
         shaper.setColor(.5f, 0, 0, 1);
-        shaper.rect(-width/2, -height/2, (float)charge/maxCharge*width, height/24);
+        shaper.rect(-width/2, -height/2, charge, height/24);
 
         //SLINGTRAIL
         shaper.setColor(.2f, .2f, .2f, 1);
-        shaper.rect(sling.x-sling.width/2-width/2, sling.y-height/2, sling.width/2, charge, sling.width, charge, 1, 1, angle);
+        shaper.rect(sling.x-width/2-shot.location.width/2, sling.y, sling.width/2, sling.height, sling.width, sling.height, 1, 1, angle);
     }
 
     @Override
