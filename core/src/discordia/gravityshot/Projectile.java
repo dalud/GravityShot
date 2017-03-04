@@ -16,10 +16,10 @@ public class Projectile {
     float angle, color;
     Sound success, failure;
     boolean fail, succeed, launched;
-    Planet check;
+    Planets planets;
     Vector2 velocity, position;
 
-    public Projectile(Planet check){
+    public Projectile(Planets planets){
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
         location = new Rectangle(-width/40/2, -height/2.35f, width/40, height/20);
@@ -27,7 +27,7 @@ public class Projectile {
         failure = Gdx.audio.newSound(Gdx.files.internal("sounds/failure.mp3"));
         color = 1;
         countdown = 50;
-        this.check = check;
+        this.planets = planets;
         velocity = new Vector2();
         position = location.getPosition(new Vector2());
     }
@@ -42,13 +42,13 @@ public class Projectile {
         shaper.rect(location.x, location.y, location.width/2, location.height/2, location.width, location.height, 1, 1, angle);
 
         //SUCCESS
-        if(location.y > height/2) {
+        if(location.y > height/2-location.height) {
             success.play();
             succeed = true;
             reset();
         }
         //FAILURE
-        if((location.x < -width/2) || (location.x > width/2) || checkCollision(check)){
+        if((location.x < -width/2) || (location.x > width/2) || checkCollision(planets)){
             failure.play();
             fail = true;
             reset();
@@ -57,9 +57,11 @@ public class Projectile {
 
     private void calculateDeviation() {
         if(launched) {
-            check.gravityD.set(check.location.x-location.x, check.location.y-location.y);
-            check.gravityD.setLength(check.gravityF);
-            velocity.add(check.gravityD);
+            for(Planet check : planets.planets){
+                check.gravityD.set(check.location.x-location.x, check.location.y-location.y);
+                check.gravityD.setLength(check.gravityF);
+                velocity.add(check.gravityD);
+            }
         }
     }
 
@@ -72,7 +74,7 @@ public class Projectile {
             if(succeed) {
                 shaper.setColor(0, color, 0, 0);
                 shaper.rect(-width/2, -height/2, width, height);
-                check.reset();
+                planets.reset();
             }
             else if (fail){
                 shaper.setColor(color, 0, 0, 0);
@@ -94,7 +96,7 @@ public class Projectile {
     }
 
     public void shoot(Vector2 pull) {
-        pull.setLength(pull.len()/width*13); //SKAALATAAN POWERBARIN MUKAISEKSI
+        pull.setLength(pull.len()/width*10); //SKAALATAAN POWERBARIN MUKAISEKSI
         if(pull.len() < 3) pull.setLength(3);
         if(!launched){
             velocity = pull;
@@ -102,7 +104,10 @@ public class Projectile {
         }
     }
 
-    public boolean checkCollision(Planet check){ //PARAMETRI, KOSKA TULEE LISÄÄ PLANEETTOJA JOSKUS EHKÄ
-        return (int)(location.getPosition(position).sub(new Vector2(check.location.x, check.location.y)).len()-check.radius) < 0;
+    public boolean checkCollision(Planets planets){ //PARAMETRI, KOSKA TULEE LISÄÄ PLANEETTOJA JOSKUS EHKÄ
+        for(Planet check : planets.planets){
+            if((int)(location.getPosition(position).sub(new Vector2(check.location.x, check.location.y)).len()-check.radius) < 0) return true;
+        }
+        return false;
     }
 }

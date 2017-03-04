@@ -5,6 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends ApplicationAdapter {
 	ShapeRenderer shaper;
@@ -12,7 +16,8 @@ public class Main extends ApplicationAdapter {
 	OrthographicCamera camera;
 	Projectile shot;
 	BasicInput input;
-	Planet test;
+	Planet test, test2;
+	Planets planets;
 
 	@Override
 	public void create () {
@@ -20,7 +25,9 @@ public class Main extends ApplicationAdapter {
 		homeBase = new HomeBase();
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		test = new Planet();
-		shot = new Projectile(test);
+		test2 = new Planet();
+		planets = new Planets();
+		shot = new Projectile(planets);
 		input = new BasicInput(shot);
 
 		Gdx.input.setInputProcessor(input);
@@ -38,7 +45,7 @@ public class Main extends ApplicationAdapter {
 		shot.drawFlash(shaper);
 		homeBase.draw(shaper);
 		shot.draw(shaper);
-		test.draw(shaper);
+		planets.draw(shaper);
 		input.draw(shaper);
 		shaper.end();
 	}

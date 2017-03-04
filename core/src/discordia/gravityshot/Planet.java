@@ -29,7 +29,7 @@ public class Planet {
 
     public void reset(){    //JOSTAIN ***** SYYSTÄ KONSTRUKTORIN UUDELLEEN KUTSUMINEN EI ASETA LOCATION CIRCLEÄ, SIKSI TÄMÄ ABOMINAATIO
         float Radius = (float) Math.random();
-        radius = Radius*width/3;
+        radius = Radius*width/5;
         r = (float)Math.random();
         g = (float)Math.random();
         b = (float)Math.random();
